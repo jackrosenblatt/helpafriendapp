@@ -9,6 +9,7 @@ var GOOGLE_API_KEY2='AIzaSyDlXk18Mi2CRdBZ6nIdfrmIIejikcyia3Y';
 var GOOGLE_API_KEY='AIzaSyAO1SPYcbtw_MFPBS1TKkzp8BnYMqEjGks'
 var GOOGLE_API_REVERSE_GEOLOCATING='https://maps.googleapis.com/maps/api/geocode/json?latlng='
 var END_DATE_CONST = new Date(new Date().getTime() + 1000*60*60*24*30)
+console.disableYellowBox = true
 
 class JobScreen extends React.Component {
   static navigationOptions =  (props) => ({
@@ -23,10 +24,9 @@ class JobScreen extends React.Component {
       startDate: new Date(),
       endDate: END_DATE_CONST,
       filteredJobs: [],
-      address: '329 12th street'
+      address: '450 9th St, San Francisco, CA 94103'
     }
   }
-
 
   componentDidMount() {
     console.log('called');
@@ -121,19 +121,27 @@ class JobList extends React.Component {
 }
 
 class JobItem extends React.Component {
- render() {
+  details() {
+    AsyncStorage.setItem('job', JSON.stringify(this.props.job))
+    this.props.navigation.navigate('JobDetails')
+  }
+
+  render() {
    console.log(this.props.job.picture || 'https://placebear.com/50/50')
    return (
-     <View>
-       <View>
-         <Image source={{uri: this.props.job.picture || 'https://placebear.com/50/50'}} style={{width: 50, height: 50}} />
+     <View style={styles.jobContainer}>
+       <View style={styles.picContainer}>
+         <Image source={{uri: this.props.job.picture || 'https://placebear.com/50/50'}} style={{width: 150, height: 150}} />
        </View>
-       <View>
+       <View style={styles.wordContainer}>
          <Text>{this.props.job.title}</Text>
-         <Text> More fields to add </Text>
+         <View style={{flexDirection: 'row'}}>
+           <Text>${this.props.job.totalPay}</Text>
+           <Text>   {this.props.job.timeAllotted}</Text>
+         </View>
        </View>
-       <View>
-         <Button title='>' onPress={() => this.props.navigation.navigate('JobDetails')}></Button>
+       <View style={styles.viewMoreContainer}>
+         <Button title='>' onPress={() => this.details()}></Button>
        </View>
      </View>
    )
@@ -160,6 +168,7 @@ class JobDetailsScreen extends React.Component {
   }
 
   apply() {
+    AsyncStorage.setItem('jobId', JSON.stringify(this.state.job))
     this.props.navigation.navigate('Application')
   }
 
@@ -267,16 +276,43 @@ class ApplicationFormScreen extends React.Component {
     this.state = {
       fName: '',
       mName: '',
-      lname: '',
+      lName: '',
       email: '',
       phone: 0,
       social: 0,
       password: '',
-      confirmPassword: ''
+      confirmPassword: '',
+      jobId: ''
     }
   }
 
+  componentDidMount() {
+    AsyncStorage.getItem('jobId')
+    .then(id => {jobId=JSON.parse(id)})
+  }
+
   submit() {
+    // if(this.state.fName && this.state.mName && this.state.lName && this.state.email &&
+    //   this.state.phone && this.state.social && this.state.password && this.state.confirmPassword &&
+    //   this.state.password === this.state.confirmPassword) {
+    //     fetch('http://murmuring-dawn-35157.heroku.com/mobile/api/jobs/'+jobId, {
+    //       method: 'POST',
+    //       body: JSON.stringify({
+    //         firstName: this.state.fName,
+    //         middleName: this.state.mName,
+    //         lastName:this.state.lName,
+    //         email: this.state.email,
+    //         phoneNumber: this.state.phone,
+    //         socialSecurityNumber: this.state.social,
+    //         password: this.state.password
+    //       })
+    //     })
+    //     .then((value) => {this.props.navigation.navigate('Congrats')})
+    //     .catch(console.log)
+    //   }
+    //   else{
+    //     console.log(this.state.fName, this.state.mName)
+    //   }
     this.props.navigation.navigate('Congrats')
   }
 
@@ -343,6 +379,7 @@ export default StackNavigator({
   }
 }, {initialRouteName: 'Jobs'});
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -355,8 +392,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 5,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    marginBottom: 10
   },
   picContainer: {
     flex: 2,
@@ -365,7 +402,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   wordContainer: {
-    flex: 3,
+    flex: 2,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center'
