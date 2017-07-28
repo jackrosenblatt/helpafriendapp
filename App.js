@@ -159,6 +159,10 @@ class JobDetailsScreen extends React.Component {
       })
   }
 
+  apply() {
+    this.props.navigation.navigate('Application')
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -170,6 +174,7 @@ class JobDetailsScreen extends React.Component {
         <Text style={{textAlign: 'center'}}>When: {moment(this.state.job.title).format('MM/DD/YYYY, h:mm a')}</Text>
         <Text style={{textAlign: 'center'}}>Total Pay: ${this.state.job.totalPay}</Text>
         <Text style={{textAlign: 'center'}}>Time Allotted: {this.state.job.timeAllotted}</Text>
+        <Button title='Apply Now' onPress={() => this.apply()}/>
       </View>
     );
   }
@@ -252,6 +257,74 @@ class FilterScreen extends React.Component {
   }
 }
 
+class ApplicationFormScreen extends React.Component {
+  static navigationOptions =  (props) => ({
+    title: 'Application'
+  });
+
+  constructor(props){
+    super(props)
+    this.state = {
+      fName: '',
+      mName: '',
+      lname: '',
+      email: '',
+      phone: 0,
+      social: 0,
+      password: '',
+      confirmPassword: ''
+    }
+  }
+
+  submit() {
+    this.props.navigation.navigate('Congrats')
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <TextInput placeholder='Enter your first name'
+          onChange={name => this.setState({fName: name})} />
+
+        <TextInput placeholder='Enter your middle name'
+          onChange={name => this.setState({mName: name})} />
+
+        <TextInput placeholder='Enter your last name'
+          onChange={name => this.setState({lName: name})} />
+
+        <TextInput keyboardType='email-address' placeholder='Enter your email'
+          onChange={email => this.setState({email})} />
+        <TextInput keyboardType='numeric' placeholder='Enter your phone'
+          onChange={num => this.setState({phone: num})} />
+
+        <TextInput keyboardType='numeric' placeholder='Enter your social security number'
+          onChange={social => this.setState({social})} />
+
+        <TextInput placeholder='Enter your password' secureTextEntry={true}
+          onChange={pass => this.setState({password: pass})} />
+
+        <TextInput placeholder='Enter your confirm password' secureTextEntry={true}
+          onChange={pass => this.setState({confirmPassword: pass})} />
+
+        <Button title='Submit' onPress={() => this.submit()}/>
+      </View>
+    )
+  }
+}
+
+class CongratsScreen extends React.Component {
+  static navigationOptions =  (props) => ({
+    title: 'Congrats',
+    headerRight: <Button title="Back to Jobs" onPress={() => props.navigation.navigate('Jobs')}/>
+  });
+
+  render() {
+    return(
+      <Text>Congrats!</Text>
+    )
+  }
+}
+
 export default StackNavigator({
   Jobs: {
     screen: JobScreen
@@ -261,6 +334,12 @@ export default StackNavigator({
   },
   Filter: {
     screen: FilterScreen
+  },
+  Application: {
+    screen: ApplicationFormScreen
+  },
+  Congrats: {
+    screen: CongratsScreen
   }
 }, {initialRouteName: 'Jobs'});
 
